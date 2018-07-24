@@ -1,0 +1,147 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN"> 
+<!--
+　　 へ　　　　　／|
+　　/＼7　　∠＿/
+　 /　│　　 ／　／
+　│　Z ＿,＜　／　　 /`ヽ
+　│　　　　　ヽ　　 /　　〉
+　 Y　　　　　`　 /　　/
+　ｲ●　､　●　　⊂⊃〈　　/
+　()　 へ　　　　|　＼〈
+　　>ｰ ､_　 ィ　 │ ／／
+　 / へ　　 /　ﾉ＜| ＼＼
+　 ヽ_ﾉ　　(_／　 │／／
+　　7　　　　　　　|／
+　　＞―r￣￣`ｰ―＿
+皮卡丘,对偷看者使用十万伏特
+-->
+
+<head>
+    <!--声明当前页面的编码集:charset=gbk,gb2312(中文编码),UTF-8(国际编码)-->
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" />
+    <!--如果是IE 就以标准渲染-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <!-- 视窗  -->
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0" />
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <!--声明当前页面的三要素-->
+    <title>SnakeMatrix</title>
+    <meta name="Author" content="" />
+    <!--作者-->
+    <meta name="keywords" content="关键词,关键词" />
+    <!--关键词：英文逗号隔开 31字-->
+    <meta name="description" content="" />
+    <!--网站概述：百度80字以内 标准是76个字-->
+    <link rel="shortcut icon" type="images/x-icon" href="icon/psyduck.ico" />
+    <!-- css -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        #ul li {
+            border: 1px solid red;
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            font-style: normal;
+            line-height: 35px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <button>sequence</button>
+    <button>screw</button>
+    <ul id="ul"></ul>
+
+</body>
+<script src="js/jquery-3.3.1.js"></script>
+<script src="js/Pub.js"></script>
+<script>
+    class SnakeMatrix {
+        constructor(target, num) {
+            this.target = target;
+            this.num = num;
+            this.arr = [];
+            this.len = Math.pow(this.num, 2);
+        }
+        init(key) {
+            switch (key) {
+                case "sequence":
+                    this.sequence(); break;
+                case "screw":
+                    this.screw(); break;
+            }
+            this.format();
+        }
+        screw() {
+            let [x, y, minX, minY, maxX, maxY] = [0, 0, 0, 0, this.num - 1, this.num - 1];
+            for (let index = 2; index <= this.len; index++) {
+                if (x == minX && y - 1 == minY) { //x不变在最小值,y到最小值的前一个,拐弯
+                    minX++;
+                    minY++;
+                    maxX--;
+                    maxY--;
+                }
+                if (x < maxX && y == minY) { //x由小到大,y不变在最小值
+                    x++;
+                } else if (x == maxX && y < maxY) { //x不变在最大值,y由小到大
+                    y++;
+                } else if (x > minX && y == maxY) { //x由大到小,y不变在最大值
+                    x--;
+                } else { //x不变在最小值,y由大到小
+                    y--;
+                }
+                this.arr[this.num * y + x] = this.complate(index);
+            }
+            this.arr[0] = this.complate(1);
+        }
+        sequence() {
+            for (let index = 0; index <= this.len; index++) {
+                this.arr[index] = this.complate(index + 1);
+            }
+        }
+        format() {
+            let count = -1; this.target.innerHTML = "";
+            for (let index = 0; index < this.len; index++) {
+                if (count === this.num - 1) {
+                    count = 0;
+                    this.target.appendChild(document.createElement("br"));
+                }
+                else {
+                    count++;
+                }
+                const li = document.createElement("li");
+                // console.log(this.arr[index]);
+                if (this.arr[index]) {
+                    li.appendChild(document.createTextNode(this.arr[index]));
+                } else {
+                    li.appendChild(document.createTextNode("*"));
+                }
+                this.target.appendChild(li);
+            }
+        }
+        complate(num) {
+            return ("" + num).padStart((this.len + "").length, "0");
+        }
+    }
+
+    const ul = document.getElementById("ul");
+    const btn = document.getElementsByTagName("button");
+    const snake = new SnakeMatrix(ul, 11);
+    btn[0].onclick = () => {
+        snake.init("sequence");
+    }
+    btn[1].onclick = () => {
+        snake.init("screw");
+    }
+</script>
+
+
+
+</html>
